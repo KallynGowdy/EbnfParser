@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +8,7 @@ namespace EbnfParser
 	/// <summary>
 	/// Defines a class that represents a list of grammar elements that can be alternated.
 	/// </summary>
-	public class AlternatedExpression : IGrammarElement, IEquatable<AlternatedExpression>
+	public class AlternatedExpression : IGrammarElement, IEquatable<AlternatedExpression>, IEnumerable<IGrammarElement>
 	{
 		/// <summary>
 		/// Indicates whether the current object is equal to another object of the same type.
@@ -35,6 +36,15 @@ namespace EbnfParser
 			return elements?.GetHashCode() ?? 0;
 		}
 
+		/// <summary>
+		/// Returns an enumerator that iterates through a collection.
+		/// </summary>
+		/// <returns>
+		/// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+		/// </returns>
+		/// <filterpriority>2</filterpriority>
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
 		private IGrammarElement[] elements;
 
 		/// <summary>
@@ -42,18 +52,7 @@ namespace EbnfParser
 		/// The given alternated expressions will be flattened into a single alternated expression containing all of the operands.
 		/// </summary>
 		/// <exception cref="ArgumentNullException">The value of 'grammars' cannot be null. </exception>
-		public AlternatedExpression(AlternatedExpression left, AlternatedExpression right) : this(left.Elements.Concat(right.Elements))
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new <see cref="AlternatedExpression"/>.
-		/// If either (or both) of the given elements are an <see cref="AlternatedExpression"/> then they will be flattened.
-		/// </summary>
-		/// <param name="left">The first option in the set.</param>
-		/// <param name="right">The second option in the set.</param>
-		/// <exception cref="ArgumentNullException">The value of 'grammars' cannot be null.</exception>
-		public AlternatedExpression(IGrammarElement left, IGrammarElement right) : this(WrapToAlternatedExpression(left), WrapToAlternatedExpression(right))
+		public AlternatedExpression(AlternatedExpression left, AlternatedExpression right) : this(new[] { left, right }.AsEnumerable())
 		{
 		}
 
@@ -66,17 +65,39 @@ namespace EbnfParser
 		{
 		}
 
+		public AlternatedExpression(params AlternatedExpression[] expressions) : this(expressions.AsEnumerable())
+		{
+
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="AlternatedExpression"/>.
+		/// </summary>
+		/// <param name="terminals">The list of grammars that should be alternated.</param>
+		/// <exception cref="ArgumentNullException">The value of 'grammars' cannot be null. </exception>
+		public AlternatedExpression(params Terminal[] terminals) : this(terminals.AsEnumerable())
+		{
+		}
+
 		/// <summary>
 		/// Initializes a new <see cref="AlternatedExpression"/>.
 		/// </summary>
 		/// <param name="grammars">The list of grammars that should be alternated.</param>
 		/// <exception cref="ArgumentNullException">The value of 'grammars' cannot be null. </exception>
-		public AlternatedExpression(IEnumerable<IGrammarElement> grammars)
+		public AlternatedExpression(IEnumerable<IGrammarElement> grammars) : this(grammars.Select(WrapToAlternatedExpression))
 		{
-			if (grammars == null) throw new ArgumentNullException("grammars");
-			var grammarElements = grammars as IGrammarElement[] ?? grammars.ToArray();
-			this.Elements = new IGrammarElement[grammarElements.Length];
-			grammarElements.CopyTo(this.Elements, 0);
+
+		}
+
+		private AlternatedExpression(IEnumerable<AlternatedExpression> expressions)
+		{
+			if (expressions == null) throw new ArgumentNullException("expressions");
+			this.Elements = expressions.SelectMany(e => e).ToArray();
+		}
+
+		private AlternatedExpression(IList<IGrammarElement> grammars)
+		{
+			this.Elements = grammars.ToArray();
 		}
 
 		/// <summary>
@@ -89,11 +110,11 @@ namespace EbnfParser
 			AlternatedExpression expression = element as AlternatedExpression;
 			if (expression != null)
 			{
-				return new AlternatedExpression(expression.Elements);
+				return new AlternatedExpression(expression.Elements.ToList());
 			}
 			else
 			{
-				return new AlternatedExpression(element);
+				return new AlternatedExpression(new List<IGrammarElement>() { element });
 			}
 		}
 
@@ -136,9 +157,22 @@ namespace EbnfParser
 			return Equals(obj as AlternatedExpression);
 		}
 
-		public override string ToString()
-		{
-			return string.Join(" | ", Elements.Select(e => e.ToString()));
-		}
+		/// <summary>
+		/// Returns an enumerator that iterates through the collection.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+		/// </returns>
+		/// <filterpriority>1</filterpriority>
+		public IEnumerator<IGrammarElement> GetEnumerator() => Elements.AsEnumerable().GetEnumerator();
+
+		/// <summary>
+		/// Returns a string that represents the current object.
+		/// </summary>
+		/// <returns>
+		/// A string that represents the current object.
+		/// </returns>
+		/// <filterpriority>2</filterpriority>
+		public override string ToString() => string.Join(" | ", Elements.Select(e => e.ToString()));
 	}
 }

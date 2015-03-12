@@ -55,6 +55,7 @@ namespace EbnfParser.Tests
 
 		[Theory]
 		[InlineData("a", "b")]
+		[InlineData("b", "a")]
 		public void Test_AddedTerminalsProduceGrammarExpression(string firstTerminal, string secondTerminal)
 		{
 			Terminal first = firstTerminal;
@@ -68,6 +69,7 @@ namespace EbnfParser.Tests
 
 		[Theory]
 		[InlineData("a", "b", "c")]
+		[InlineData("b", "a", "c")]
 		public void Test_AlternatedTerminalsProduceGrammarExpression(string firstTerminal, string secondTerminal, string thirdTerminal)
 		{
 			Terminal first = firstTerminal;
