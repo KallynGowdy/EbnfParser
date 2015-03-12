@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.22609.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EbnfParser", "EbnfParser\EbnfParser.csproj", "{33175548-1D93-4151-AEE4-F02C4DB59A56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EbnfParser.Tests", "EbnfParser.Tests\EbnfParser.Tests.csproj", "{BC6E6E59-102E-458A-9100-37312990AF5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{33175548-1D93-4151-AEE4-F02C4DB59A56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33175548-1D93-4151-AEE4-F02C4DB59A56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33175548-1D93-4151-AEE4-F02C4DB59A56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC6E6E59-102E-458A-9100-37312990AF5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC6E6E59-102E-458A-9100-37312990AF5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC6E6E59-102E-458A-9100-37312990AF5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC6E6E59-102E-458A-9100-37312990AF5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
