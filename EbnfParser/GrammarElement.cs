@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace EbnfParser
 {
@@ -92,5 +93,12 @@ namespace EbnfParser
 		{
 			return new AlternationExpression(left, (Terminal)right);
 		}
+
+		/// <summary>
+		/// Parses the grammar element from the given input stream.
+		/// </summary>
+		/// <param name="input">The input stream (Usually either a StringReader or StreamReader) that the element should be parsed from.</param>
+		/// <returns></returns>
+		public abstract ParseResult Parse(TextReader input);
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace EbnfParser
 {
@@ -90,6 +91,11 @@ namespace EbnfParser
 		/// </returns>
 		/// <param name="other">An object to compare with this object.</param>
 		public override bool Equals(GrammarElement other) => Equals(other as Terminal);
+
+		public override ParseResult Parse(TextReader input)
+		{
+			
+		}
 
 		/// <summary>
 		///     Returns a string that represents the current object.
