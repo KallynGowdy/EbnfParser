@@ -4,12 +4,12 @@ using Xunit;
 
 namespace EbnfParser.Tests
 {
-	public class EbnfTerminalTests
+	public class TerminalTests
 	{
 		[Theory]
 		[InlineData("a", "b")]
 		[InlineData("b", "c")]
-		public void Test_TerminalValueIsPopluatedByConstructor(string value, string notMatchingValue)
+		public void Test_TerminalValueIsPopulatedByConstructor(string value, string notMatchingValue)
 		{
 			Terminal terminal = new Terminal(value);
 
@@ -63,8 +63,9 @@ namespace EbnfParser.Tests
 
 			var expression = first + second;
 
-			Assert.Equal(expression.Left, (Terminal)firstTerminal);
-			Assert.Equal(expression.Right, (Terminal)secondTerminal);
+			Assert.Collection(expression,
+				e => Assert.Equal(e, first),
+				e => Assert.Equal(e, second));
 		}
 
 		[Theory]
@@ -82,6 +83,44 @@ namespace EbnfParser.Tests
 				a => a.Equals(firstTerminal),
 				b => b.Equals(secondTerminal),
 				c => c.Equals(thirdTerminal));
+		}
+
+		[Theory]
+		[InlineData("a")]
+		[InlineData("b")]
+		[InlineData("c")]
+		public void Test_NegatingTerminalProducesRepeatedGrammarExpression(string terminalValue)
+		{
+			Terminal terminal = terminalValue;
+
+			RepetitionExpression expression = !terminal;
+
+			Assert.NotNull(expression);
+			Assert.Equal(terminal, expression.RepeatedValue);
+		}
+
+		[Fact]
+		public void Test_AdvancedExpressionMapsToAnExpectedExpression()
+		{
+			AlternationExpression aOrB = (Terminal)"a" | "b";
+
+			Assert.NotNull(aOrB);
+			Assert.Collection(aOrB,
+				e => Assert.True(e.Equals("a")),
+				e => Assert.True(e.Equals("b")));
+
+			RepetitionExpression manyAOrB = !aOrB;
+
+			Assert.NotNull(manyAOrB);
+			Assert.NotNull(manyAOrB.RepeatedValue);
+			Assert.Same(aOrB, manyAOrB.RepeatedValue);
+
+			ConcatenationExpression aAndBWithCAtEnd = manyAOrB + "c";
+
+			Assert.NotNull(aAndBWithCAtEnd);
+			Assert.Collection(aAndBWithCAtEnd,
+                e => Assert.Same(manyAOrB, e),
+				e => Assert.True(e.Equals("c")));
 		}
 	}
 }

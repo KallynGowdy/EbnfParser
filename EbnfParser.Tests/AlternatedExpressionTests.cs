@@ -12,9 +12,9 @@ namespace EbnfParser.Tests
 		[InlineData("b", "c", "a")]
 		public void Test_GrammarElementsAreStored(string firstTerminal, string secondTerminal, string thirdTerminal)
 		{
-			AlternatedExpression alternatedExpression = new AlternatedExpression(firstTerminal, secondTerminal, thirdTerminal);
+			AlternationExpression alternationExpression = new AlternationExpression(firstTerminal, secondTerminal, thirdTerminal);
 
-			Assert.Collection(alternatedExpression,
+			Assert.Collection(alternationExpression,
 				a => a.Equals(firstTerminal),
 				b => b.Equals(secondTerminal),
 				c => c.Equals(thirdTerminal));
@@ -22,11 +22,27 @@ namespace EbnfParser.Tests
 
 		[Theory]
 		[MemberData("AlternatedExpressions")]
-		public void Test_AlternatedExpressionsAreFlattened(AlternatedExpression[] alternatedExpressions, IGrammarElement[] flattenedElements)
+		public void Test_AlternatedExpressionsAreFlattened(AlternationExpression[] alternationExpressions, GrammarElement[] flattenedElements)
 		{
-			AlternatedExpression expression = new AlternatedExpression(alternatedExpressions);
+			AlternationExpression expression = new AlternationExpression(alternationExpressions);
 
-			Assert.Collection(expression, flattenedElements.Select<IGrammarElement, Action<IGrammarElement>>(e => (a => Assert.True(a.Equals(e)))).ToArray());
+			Assert.Collection(expression, 
+				flattenedElements.Select<GrammarElement, Action<GrammarElement>>(e => (a => Assert.True(a.Equals(e)))).ToArray());
+		}
+
+		[Theory]
+		[MemberData("AlternatedExpressions")]
+		public void Test_OrOperatorAlternatesAlternatedExpressionsIntoOneFlattenedExpression(AlternationExpression[] alternationExpressions, GrammarElement[] flattenedElements)
+		{
+			AlternationExpression expression = alternationExpressions[0];
+			for (int i = 1; i < alternationExpressions.Length; i++)
+			{
+				expression = expression | alternationExpressions[i];
+			}
+
+			// Assert that the resulting elements equal the already flattened elements
+			Assert.Collection(expression,
+				flattenedElements.Select<GrammarElement, Action<GrammarElement>>(e => (a => Assert.True(a.Equals(e)))).ToArray());
 		}
 
 		public static IEnumerable<object[]> AlternatedExpressions
@@ -37,12 +53,12 @@ namespace EbnfParser.Tests
 				{
 					new object[]
 					{
-						new AlternatedExpression[]
+						new AlternationExpression[]
 						{
-							new AlternatedExpression("a", "b"),
-							new AlternatedExpression("c", "d")
+							new AlternationExpression("a", "b"),
+							new AlternationExpression("c", "d")
 						},
-						new IGrammarElement[]
+						new GrammarElement[] // Flattened Elements
 						{
 							(Terminal)"a",
 							(Terminal)"b",
@@ -52,13 +68,13 @@ namespace EbnfParser.Tests
 					},
 					new object[]
 					{
-						new AlternatedExpression[]
+						new AlternationExpression[]
 						{
-							new AlternatedExpression("d", "b"),
-							new AlternatedExpression("c", "d"),
-							new AlternatedExpression("j", "q", "s")
+							new AlternationExpression("d", "b"),
+							new AlternationExpression("c", "d"),
+							new AlternationExpression("j", "q", "s")
 						},
-						new IGrammarElement[]
+						new GrammarElement[]
 						{
 							(Terminal)"d",
 							(Terminal)"b",
