@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace EbnfParser
 {
@@ -40,6 +41,24 @@ namespace EbnfParser
 		/// </returns>
 		/// <param name="other">An object to compare with this object.</param>
 		public override bool Equals(GrammarElement other) => Equals(other as RepetitionExpression);
+
+		public override ParseResult Parse(string input)
+		{
+			List<ParseNode> nodes = new List<ParseNode>();
+			ParseResult result;
+			do
+			{
+				result = RepeatedValue.Parse(input);
+
+				if (result.IsSuccess)
+				{
+					nodes.Add(result.RootNode);
+					input = input.Substring(result.RootNode.Length);
+				}
+			} while (result.IsSuccess);
+
+			return Success(new RepetitionNode(this, nodes.ToArray()));
+		}
 
 		/// <summary>
 		///     Determines whether the specified <see cref="T:System.Object" /> is equal to the current

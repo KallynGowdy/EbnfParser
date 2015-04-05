@@ -95,10 +95,31 @@ namespace EbnfParser
 		}
 
 		/// <summary>
-		/// Parses the grammar element from the given input stream.
+		/// Parses the grammar element from the given input.
 		/// </summary>
-		/// <param name="input">The input stream (Usually either a StringReader or StreamReader) that the element should be parsed from.</param>
+		/// <param name="input">The input that the element should be parsed from.</param>
 		/// <returns></returns>
-		public abstract ParseResult Parse(TextReader input);
+		public abstract ParseResult Parse(string input);
+
+		/// <summary>
+		/// Creates a new successful <see cref="ParseResult"/> using the given parse node.
+		/// </summary>
+		/// <param name="node">The parse node that represents the result of the successful operation.</param>
+		/// <returns></returns>
+		protected ParseResult Success(ParseNode node)
+		{
+			return ParseResult.Success(node);
+		}
+
+		/// <summary>
+		/// Creates a new parse result that represents a failed parsing operation.
+		/// </summary>
+		/// <param name="errors">The list of errors that occurred while parsing.</param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentNullException">The value of 'failingElement' cannot be null. </exception>
+		protected ParseResult Failure(params string[] errors)
+		{
+			return ParseResult.Failure(this, errors);
+		}
 	}
 }

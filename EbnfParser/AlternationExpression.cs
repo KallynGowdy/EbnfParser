@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace EbnfParser
 {
 	/// <summary>
-	///     Defines a class that represents a list of grammar elements that can be alternated.
+	///     Defines a class that represents a list of grammar elements that can be alternated. That is, one or more elements that can be parsed in place of each other.
 	/// </summary>
 	public class AlternationExpression : GrammarElement, IEquatable<AlternationExpression>, IEnumerable<GrammarElement>
 	{
@@ -134,6 +135,29 @@ namespace EbnfParser
 		public override bool Equals(GrammarElement other)
 		{
 			return Equals(other as AlternationExpression);
+		}
+
+		/// <summary>
+		/// Parses the grammar element from the given input stream.
+		/// </summary>
+		/// <param name="input">The input stream (Usually either a StringReader or StreamReader) that the element should be parsed from.</param>
+		/// <returns></returns>
+		public override ParseResult Parse(string input)
+		{
+			List<ParseResult> failedResults = new List<ParseResult>(Elements.Length);
+			foreach (GrammarElement element in Elements)
+			{
+				var result = element.Parse(input);
+				if (result.IsSuccess)
+				{
+					return Success(new AlternationNode(this, result.RootNode));
+				}
+				else
+				{
+					failedResults.Add(result);
+				}
+			}
+			return Failure(failedResults.SelectMany(r => r.Errors).ToArray());
 		}
 
 		/// <summary>

@@ -92,9 +92,16 @@ namespace EbnfParser
 		/// <param name="other">An object to compare with this object.</param>
 		public override bool Equals(GrammarElement other) => Equals(other as Terminal);
 
-		public override ParseResult Parse(TextReader input)
+		public override ParseResult Parse(string input)
 		{
-			
+			if (input.StartsWith(Value))
+			{
+				return Success(new TerminalNode(this, Value));
+			}
+			else
+			{
+				return Failure($"'{input}' does not match '{Value}'.");
+			}
 		}
 
 		/// <summary>

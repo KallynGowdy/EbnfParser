@@ -120,6 +120,24 @@ namespace EbnfParser
 		/// <param name="other">An object to compare with this object.</param>
 		public override bool Equals(GrammarElement other) => Equals(other as ConcatenationExpression);
 
+		public override ParseResult Parse(string input)
+		{
+			ParseNode[] nodes = new ParseNode[Elements.Length];
+			for (int i = 0; i < Elements.Length; i++)
+			{
+				GrammarElement element = Elements[i];
+				ParseResult result = element.Parse(input);
+				if (result.IsSuccess)
+				{
+					nodes[i] = result.RootNode;
+					input = input.Substring(result.RootNode.Length);
+				}
+				else
+					return Failure(result.Errors);
+			}
+			return Success(new ConcatenationNode(this, nodes));
+		}
+
 		/// <summary>
 		///     Indicates whether the current object is equal to another object of the same type.
 		/// </summary>

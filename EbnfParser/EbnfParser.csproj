@@ -43,6 +43,8 @@
     <Compile Include="ConcatenationExpression.cs" />
     <Compile Include="EbnfParser.cs" />
     <Compile Include="GrammarElement.cs" />
+    <Compile Include="ParseNode.cs" />
+    <Compile Include="ParseResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepetitionExpression.cs" />
     <Compile Include="Terminal.cs" />

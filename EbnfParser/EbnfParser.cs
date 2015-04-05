@@ -19,36 +19,26 @@ namespace EbnfParser
 			this.Root = root;
 		}
 
-
+		/// <summary>
+		/// Parses the given input and returns the result of the operation.
+		/// </summary>
+		/// <param name="input">The string that should be parsed.</param>
+		/// <returns></returns>
 		public ParseResult Parse(string input)
-		{
-			if (input == null) throw new ArgumentNullException("input");
-			return Parse(new StringReader(input));
-		}
-
-		public ParseResult Parse(TextReader input)
 		{
 			if (input == null) throw new ArgumentNullException("input");
 			return Root.Parse(input);
 		}
-	}
-
-	public class ParseResult
-	{
-		/// <summary>
-		/// Gets whether the parser was able to successfully parse the input.
-		/// </summary>
-		public bool Success { get; }
-		
-		/// <summary>
-		/// Gets the root node that is a part of the parse tree.
-		/// </summary>
-		public ParseNode RootNode { get; }
 
 		/// <summary>
-		/// 
+		/// Parses the given input and returns the result of the operation.
 		/// </summary>
-		public string[] Errors { get; }
-
+		/// <param name="input">The text that should be parsed, surfaced through a text reader.</param>
+		/// <returns></returns>
+		public ParseResult Parse(TextReader input)
+		{
+			if (input == null) throw new ArgumentNullException("input");
+			return Root.Parse(input.ReadToEnd());
+		}
 	}
 }
